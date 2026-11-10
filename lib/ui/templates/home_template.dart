@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../core/theme/app_colors.dart';
 
-/// Template: estrutura (layout) da tela inicial, sem regras de negócio.
-/// Recebe as "slots" já montadas pela página.
+/// Template: estrutura editorial (layout) da tela inicial, sem regras de negócio.
+/// Recebe os "slots" já montados pela página.
 class HomeTemplate extends StatelessWidget {
   const HomeTemplate({
     super.key,
@@ -40,7 +40,7 @@ class HomeTemplate extends StatelessWidget {
             slivers: [
               SliverToBoxAdapter(
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 16, 8, 0),
+                  padding: const EdgeInsets.fromLTRB(20, 20, 12, 0),
                   child: Row(
                     children: [
                       Expanded(
@@ -51,7 +51,8 @@ class HomeTemplate extends StatelessWidget {
                               Text(
                                 subtitle!,
                                 style: const TextStyle(
-                                  fontSize: 14,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w500,
                                   color: AppColors.textSecondary,
                                 ),
                               ),
@@ -60,7 +61,9 @@ class HomeTemplate extends StatelessWidget {
                             Text(
                               title,
                               style: const TextStyle(
-                                fontSize: 24,
+                                fontSize: 26,
+                                height: 1.1,
+                                letterSpacing: -0.7,
                                 fontWeight: FontWeight.w800,
                                 color: AppColors.textPrimary,
                               ),
@@ -75,13 +78,13 @@ class HomeTemplate extends StatelessWidget {
               ),
               SliverToBoxAdapter(
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
+                  padding: const EdgeInsets.fromLTRB(20, 18, 20, 0),
                   child: stats,
                 ),
               ),
               SliverToBoxAdapter(
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
+                  padding: const EdgeInsets.fromLTRB(20, 14, 20, 8),
                   child: search,
                 ),
               ),
@@ -89,7 +92,7 @@ class HomeTemplate extends StatelessWidget {
               if (resultsHeader != null)
                 SliverToBoxAdapter(
                   child: Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 16, 20, 4),
+                    padding: const EdgeInsets.fromLTRB(20, 14, 20, 6),
                     child: resultsHeader,
                   ),
                 ),
@@ -100,10 +103,9 @@ class HomeTemplate extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: onAdd,
-        icon: const Icon(Icons.add_rounded),
+        icon: const Icon(Icons.add_rounded, size: 20),
         label: const Text('Nova tarefa'),
       ),
     );
   }
 }
-

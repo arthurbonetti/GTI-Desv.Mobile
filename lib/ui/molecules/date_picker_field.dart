@@ -37,20 +37,20 @@ class DatePickerField extends StatelessWidget {
         const SectionLabel('Vencimento (opcional)'),
         Material(
           color: AppColors.surface,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(10),
           child: InkWell(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(10),
             onTap: () => _pick(context),
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(10),
                 border: Border.all(color: AppColors.border),
               ),
               child: Row(
                 children: [
                   const Icon(Icons.event_rounded,
-                      color: AppColors.textSecondary),
+                      size: 20, color: AppColors.textSecondary),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Padding(
@@ -58,9 +58,9 @@ class DatePickerField extends StatelessWidget {
                       child: Text(
                         date == null
                             ? 'Sem data definida'
-                            : '${AppDateUtils.format(date!)}  •  ${AppDateUtils.relativeLabel(date!)}',
+                            : '${AppDateUtils.format(date!)} (${AppDateUtils.relativeLabel(date!)})',
                         style: TextStyle(
-                          fontSize: 15,
+                          fontSize: 14.5,
                           color: date == null
                               ? AppColors.textMuted
                               : AppColors.textPrimary,

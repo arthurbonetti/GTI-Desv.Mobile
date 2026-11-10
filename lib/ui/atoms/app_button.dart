@@ -4,7 +4,7 @@ import '../../core/theme/app_colors.dart';
 
 enum AppButtonVariant { primary, outline, danger }
 
-/// Átomo: botão padrão do app.
+/// Átomo: botão padrão do app (geometria tátil precisa).
 class AppButton extends StatelessWidget {
   const AppButton({
     super.key,
@@ -24,17 +24,21 @@ class AppButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final shape = RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(14),
+      borderRadius: BorderRadius.circular(10),
     );
-    const padding = EdgeInsets.symmetric(horizontal: 20, vertical: 16);
-    const textStyle = TextStyle(fontSize: 16, fontWeight: FontWeight.w600);
+    const padding = EdgeInsets.symmetric(horizontal: 20, vertical: 15);
+    const textStyle = TextStyle(
+      fontSize: 15,
+      fontWeight: FontWeight.w600,
+      letterSpacing: -0.1,
+    );
 
     final child = Row(
       mainAxisSize: MainAxisSize.min,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         if (icon != null) ...[
-          Icon(icon, size: 20),
+          Icon(icon, size: 18),
           const SizedBox(width: 8),
         ],
         Text(label, style: textStyle),
@@ -48,9 +52,10 @@ class AppButton extends StatelessWidget {
           onPressed: onPressed,
           style: FilledButton.styleFrom(
             backgroundColor: AppColors.primary,
-            foregroundColor: Colors.white,
+            foregroundColor: AppColors.surface,
             padding: padding,
             shape: shape,
+            elevation: 0,
           ),
           child: child,
         );
@@ -59,8 +64,9 @@ class AppButton extends StatelessWidget {
         button = OutlinedButton(
           onPressed: onPressed,
           style: OutlinedButton.styleFrom(
+            backgroundColor: AppColors.surface,
             foregroundColor: AppColors.textPrimary,
-            side: const BorderSide(color: AppColors.border),
+            side: const BorderSide(color: AppColors.borderStrong),
             padding: padding,
             shape: shape,
           ),
@@ -72,9 +78,10 @@ class AppButton extends StatelessWidget {
           onPressed: onPressed,
           style: FilledButton.styleFrom(
             backgroundColor: AppColors.danger,
-            foregroundColor: Colors.white,
+            foregroundColor: AppColors.surface,
             padding: padding,
             shape: shape,
+            elevation: 0,
           ),
           child: child,
         );
@@ -84,4 +91,3 @@ class AppButton extends StatelessWidget {
     return expanded ? SizedBox(width: double.infinity, child: button) : button;
   }
 }
-

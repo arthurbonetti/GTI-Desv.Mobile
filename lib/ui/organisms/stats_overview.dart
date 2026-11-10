@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../../core/theme/app_colors.dart';
 import '../molecules/molecules.dart';
 
-/// Organismo: painel de resumo com progresso e estatísticas.
+/// Organismo: painel unificado de métricas em estilo grade técnica (Swiss Grid).
 class StatsOverview extends StatelessWidget {
   const StatsOverview({
     super.key,
@@ -22,36 +22,44 @@ class StatsOverview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: StatTile(
-            label: 'Pendentes',
-            value: pending,
-            icon: Icons.pending_actions_rounded,
-            color: AppColors.secondary,
-          ),
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: IntrinsicHeight(
+        child: Row(
+          children: [
+            Expanded(
+              child: StatTile(
+                label: 'Pendentes',
+                value: pending,
+                icon: Icons.pending_actions_rounded,
+                color: AppColors.primary,
+              ),
+            ),
+            const VerticalDivider(width: 1, thickness: 1, color: AppColors.border),
+            Expanded(
+              child: StatTile(
+                label: 'Concluídas',
+                value: completed,
+                icon: Icons.task_alt_rounded,
+                color: AppColors.success,
+              ),
+            ),
+            const VerticalDivider(width: 1, thickness: 1, color: AppColors.border),
+            Expanded(
+              child: StatTile(
+                label: 'Atrasadas',
+                value: overdue,
+                icon: Icons.warning_amber_rounded,
+                color: AppColors.danger,
+              ),
+            ),
+          ],
         ),
-        const SizedBox(width: 10),
-        Expanded(
-          child: StatTile(
-            label: 'Concluídas',
-            value: completed,
-            icon: Icons.task_alt_rounded,
-            color: AppColors.success,
-          ),
-        ),
-        const SizedBox(width: 10),
-        Expanded(
-          child: StatTile(
-            label: 'Atrasadas',
-            value: overdue,
-            icon: Icons.warning_amber_rounded,
-            color: AppColors.danger,
-          ),
-        ),
-      ],
+      ),
     );
   }
 }
-

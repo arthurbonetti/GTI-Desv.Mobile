@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 
 import '../../core/theme/app_colors.dart';
 
-/// Átomo: checkbox circular animado para concluir tarefas.
+/// Átomo: caixa de seleção tátil com cantos chanfrados (estilo caderno técnico).
 class TaskCheckbox extends StatelessWidget {
   const TaskCheckbox({
     super.key,
     required this.value,
     required this.onChanged,
-    this.activeColor = AppColors.success,
-    this.borderColor = AppColors.textMuted,
+    this.activeColor = AppColors.primary,
+    this.borderColor = AppColors.borderStrong,
   });
 
   final bool value;
@@ -24,25 +24,29 @@ class TaskCheckbox extends StatelessWidget {
       button: true,
       child: InkResponse(
         onTap: onChanged,
-        radius: 22,
+        radius: 20,
         child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          curve: Curves.easeOut,
-          width: 26,
-          height: 26,
+          duration: const Duration(milliseconds: 160),
+          curve: Curves.easeOutCubic,
+          width: 22,
+          height: 22,
           decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: value ? activeColor : Colors.transparent,
+            borderRadius: BorderRadius.circular(6),
+            color: value ? activeColor : AppColors.surface,
             border: Border.all(
               color: value ? activeColor : borderColor,
-              width: 2,
+              width: 1.6,
             ),
           ),
           child: AnimatedSwitcher(
-            duration: const Duration(milliseconds: 150),
+            duration: const Duration(milliseconds: 140),
             child: value
-                ? const Icon(Icons.check_rounded,
-                    key: ValueKey('checked'), size: 16, color: Colors.white)
+                ? const Icon(
+                    Icons.check_rounded,
+                    key: ValueKey('checked'),
+                    size: 15,
+                    color: AppColors.surface,
+                  )
                 : const SizedBox.shrink(key: ValueKey('unchecked')),
           ),
         ),
@@ -50,4 +54,3 @@ class TaskCheckbox extends StatelessWidget {
     );
   }
 }
-

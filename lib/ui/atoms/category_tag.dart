@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 
+import '../../core/theme/app_colors.dart';
 import '../../data/models/task.dart';
 
-/// Átomo: etiqueta que indica a categoria da tarefa.
+/// Átomo: etiqueta editorial que indica a categoria da tarefa.
 class CategoryTag extends StatelessWidget {
   const CategoryTag({super.key, required this.category});
 
@@ -11,22 +12,24 @@ class CategoryTag extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
       decoration: BoxDecoration(
-        color: category.color.withAlpha(26),
-        borderRadius: BorderRadius.circular(8),
+        color: AppColors.surfaceMuted,
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(color: AppColors.border, width: 0.8),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(category.icon, size: 13, color: category.color),
+          Icon(category.icon, size: 12, color: category.color),
           const SizedBox(width: 4),
           Text(
             category.label,
-            style: TextStyle(
-              fontSize: 12,
+            style: const TextStyle(
+              fontSize: 11.5,
               fontWeight: FontWeight.w600,
-              color: category.color,
+              letterSpacing: -0.1,
+              color: AppColors.textPrimary,
             ),
           ),
         ],
@@ -34,4 +37,3 @@ class CategoryTag extends StatelessWidget {
     );
   }
 }
-

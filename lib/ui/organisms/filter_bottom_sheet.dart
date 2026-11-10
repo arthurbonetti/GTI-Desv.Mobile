@@ -5,7 +5,7 @@ import '../../core/theme/app_colors.dart';
 import '../../data/models/task.dart';
 import '../atoms/atoms.dart';
 
-/// Organismo / BottomSheet: diálogo modal em pop-up para escolher filtros.
+/// Organismo / BottomSheet: painel modal para refinar filtros.
 class FilterBottomSheet extends StatefulWidget {
   const FilterBottomSheet({
     super.key,
@@ -19,7 +19,11 @@ class FilterBottomSheet extends StatefulWidget {
   final TaskStatusFilter initialStatus;
   final TaskCategory? initialCategory;
   final TaskPriority? initialPriority;
-  final void Function(TaskStatusFilter status, TaskCategory? category, TaskPriority? priority) onApply;
+  final void Function(
+    TaskStatusFilter status,
+    TaskCategory? category,
+    TaskPriority? priority,
+  ) onApply;
   final VoidCallback onClear;
 
   static Future<void> show(
@@ -27,7 +31,11 @@ class FilterBottomSheet extends StatefulWidget {
     required TaskStatusFilter currentStatus,
     required TaskCategory? currentCategory,
     required TaskPriority? currentPriority,
-    required void Function(TaskStatusFilter status, TaskCategory? category, TaskPriority? priority) onApply,
+    required void Function(
+      TaskStatusFilter status,
+      TaskCategory? category,
+      TaskPriority? priority,
+    ) onApply,
     required VoidCallback onClear,
   }) {
     return showModalBottomSheet(
@@ -56,9 +64,11 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
   @override
   Widget build(BuildContext context) {
     return Container(
+      constraints: const BoxConstraints(maxWidth: 520),
       decoration: const BoxDecoration(
         color: AppColors.surface,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(18)),
+        border: Border(top: BorderSide(color: AppColors.border)),
       ),
       padding: EdgeInsets.fromLTRB(
         20,
@@ -72,10 +82,10 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
         children: [
           Center(
             child: Container(
-              width: 40,
+              width: 36,
               height: 4,
               decoration: BoxDecoration(
-                color: AppColors.border,
+                color: AppColors.borderStrong,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -83,13 +93,12 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
           const SizedBox(height: 16),
           Row(
             children: [
-              const Icon(Icons.tune_rounded, color: AppColors.primary, size: 22),
-              const SizedBox(width: 8),
               const Text(
-                'Filtros',
+                'Filtrar tarefas',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
+                  letterSpacing: -0.3,
                   color: AppColors.textPrimary,
                 ),
               ),
@@ -104,11 +113,15 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                   widget.onClear();
                   Navigator.pop(context);
                 },
-                child: const Text('Limpar'),
+                style: TextButton.styleFrom(
+                  foregroundColor: AppColors.textSecondary,
+                ),
+                child: const Text('Redefinir'),
               ),
             ],
           ),
-          const Divider(height: 24),
+          const SizedBox(height: 8),
+          const Divider(height: 20),
           const SectionLabel('Status'),
           Wrap(
             spacing: 8,
@@ -121,7 +134,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
               );
             }).toList(),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 18),
           const SectionLabel('Categoria'),
           Wrap(
             spacing: 8,
@@ -138,12 +151,13 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                   icon: c.icon,
                   color: c.color,
                   selected: _category == c,
-                  onTap: () => setState(() => _category = _category == c ? null : c),
+                  onTap: () =>
+                      setState(() => _category = _category == c ? null : c),
                 );
               }),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 18),
           const SectionLabel('Prioridade'),
           Wrap(
             spacing: 8,
@@ -160,14 +174,15 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                   icon: Icons.flag_rounded,
                   color: p.color,
                   selected: _priority == p,
-                  onTap: () => setState(() => _priority = _priority == p ? null : p),
+                  onTap: () =>
+                      setState(() => _priority = _priority == p ? null : p),
                 );
               }),
             ],
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 26),
           AppButton(
-            label: 'Aplicar Filtros',
+            label: 'Ver resultados',
             icon: Icons.check_rounded,
             onPressed: () {
               widget.onApply(_status, _category, _priority);
@@ -179,4 +194,3 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
     );
   }
 }
-

@@ -5,7 +5,7 @@ import '../../data/models/task.dart';
 import '../atoms/atoms.dart';
 import '../molecules/molecules.dart';
 
-/// Organismo: cartão de tarefa (checkbox + título + descrição + metadados),
+/// Organismo: cartão de tarefa editorial (checkbox tátil + título + metadados),
 /// com gesto de arrastar para excluir.
 class TaskCard extends StatelessWidget {
   const TaskCard({
@@ -31,34 +31,39 @@ class TaskCard extends StatelessWidget {
       onDismissed: (_) => onDelete(),
       background: Container(
         alignment: Alignment.centerRight,
-        padding: const EdgeInsets.symmetric(horizontal: 24),
+        padding: const EdgeInsets.symmetric(horizontal: 20),
         decoration: BoxDecoration(
           color: AppColors.danger,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(12),
         ),
         child: const Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('Excluir',
-                style: TextStyle(
-                    color: Colors.white, fontWeight: FontWeight.w600)),
+            Text(
+              'Excluir',
+              style: TextStyle(
+                color: AppColors.surface,
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
             SizedBox(width: 8),
-            Icon(Icons.delete_outline_rounded, color: Colors.white),
+            Icon(Icons.delete_outline_rounded, color: AppColors.surface, size: 19),
           ],
         ),
       ),
       child: Material(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(16),
+        color: completed ? AppColors.background : AppColors.surface,
+        borderRadius: BorderRadius.circular(12),
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(12),
           child: Container(
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(12),
               border: Border.all(
                 color: task.isOverdue
-                    ? AppColors.danger.withAlpha(90)
+                    ? AppColors.danger.withAlpha(110)
                     : AppColors.border,
               ),
             ),
@@ -66,27 +71,27 @@ class TaskCard extends StatelessWidget {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // Faixa lateral com a cor da prioridade.
+                  // Filete de sinalização lateral com a cor da prioridade.
                   Container(
-                    width: 5,
+                    width: 3.5,
                     decoration: BoxDecoration(
                       color: completed
                           ? AppColors.border
                           : task.priority.color,
                       borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(16),
-                        bottomLeft: Radius.circular(16),
+                        topLeft: Radius.circular(12),
+                        bottomLeft: Radius.circular(12),
                       ),
                     ),
                   ),
                   Expanded(
                     child: Padding(
-                      padding: const EdgeInsets.fromLTRB(12, 14, 14, 14),
+                      padding: const EdgeInsets.fromLTRB(14, 14, 14, 14),
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Padding(
-                            padding: const EdgeInsets.only(top: 2),
+                            padding: const EdgeInsets.only(top: 1),
                             child: TaskCheckbox(
                               value: completed,
                               onChanged: onToggle,
@@ -109,8 +114,8 @@ class TaskCard extends StatelessWidget {
 
   Widget _buildContent(bool completed) {
     return AnimatedOpacity(
-      duration: const Duration(milliseconds: 200),
-      opacity: completed ? 0.55 : 1,
+      duration: const Duration(milliseconds: 180),
+      opacity: completed ? 0.5 : 1,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -119,7 +124,9 @@ class TaskCard extends StatelessWidget {
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
-              fontSize: 16,
+              fontSize: 15.5,
+              height: 1.3,
+              letterSpacing: -0.2,
               fontWeight: FontWeight.w600,
               color: AppColors.textPrimary,
               decoration: completed ? TextDecoration.lineThrough : null,
@@ -134,13 +141,14 @@ class TaskCard extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               style: const TextStyle(
                 fontSize: 13,
+                height: 1.4,
                 color: AppColors.textSecondary,
               ),
             ),
           ],
           const SizedBox(height: 10),
           Wrap(
-            spacing: 8,
+            spacing: 6,
             runSpacing: 6,
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
@@ -155,4 +163,3 @@ class TaskCard extends StatelessWidget {
     );
   }
 }
-

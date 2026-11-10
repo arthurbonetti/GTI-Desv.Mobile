@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../../core/theme/app_colors.dart';
-import '../atoms/atoms.dart';
 
-/// Molécula: cartão de estatística (IconBox + valor + rótulo).
+/// Molécula: célula de métrica com tipografia tabular de alto contraste.
 class StatTile extends StatelessWidget {
   const StatTile({
     super.key,
@@ -20,33 +19,49 @@ class StatTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.border),
-      ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          IconBox(icon: icon, color: color, size: 32),
-          const SizedBox(height: 10),
+          Row(
+            children: [
+              Container(
+                width: 7,
+                height: 7,
+                decoration: BoxDecoration(
+                  color: value > 0 ? color : AppColors.borderStrong,
+                  shape: BoxShape.circle,
+                ),
+              ),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                    letterSpacing: -0.1,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
           Text(
             '$value',
-            style: const TextStyle(
-              fontSize: 20,
+            style: TextStyle(
+              fontSize: 26,
+              height: 1.05,
               fontWeight: FontWeight.w700,
-              color: AppColors.textPrimary,
-            ),
-          ),
-          Text(
-            label,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-              fontSize: 12,
-              color: AppColors.textSecondary,
+              letterSpacing: -0.8,
+              color: value > 0 && color == AppColors.danger
+                  ? AppColors.danger
+                  : AppColors.textPrimary,
+              fontFeatures: const [FontFeature.tabularFigures()],
             ),
           ),
         ],
@@ -54,4 +69,3 @@ class StatTile extends StatelessWidget {
     );
   }
 }
-

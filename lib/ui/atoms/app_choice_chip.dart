@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../core/theme/app_colors.dart';
 
-/// Átomo: chip selecionável usado em filtros e seletores.
+/// Átomo: chip selecionável de estilo editorial usado em filtros e seletores.
 class AppChoiceChip extends StatelessWidget {
   const AppChoiceChip({
     super.key,
@@ -21,32 +21,41 @@ class AppChoiceChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final fg = selected ? Colors.white : AppColors.textSecondary;
+    final fg = selected ? AppColors.surface : AppColors.textPrimary;
     return Material(
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(8),
         child: AnimatedContainer(
-          duration: const Duration(milliseconds: 180),
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+          duration: const Duration(milliseconds: 160),
+          curve: Curves.easeOutCubic,
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           decoration: BoxDecoration(
             color: selected ? color : AppColors.surface,
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: selected ? color : AppColors.border),
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(
+              color: selected ? color : AppColors.border,
+              width: 1,
+            ),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
               if (icon != null) ...[
-                Icon(icon, size: 16, color: selected ? Colors.white : color),
+                Icon(
+                  icon,
+                  size: 15,
+                  color: selected ? AppColors.surface : color,
+                ),
                 const SizedBox(width: 6),
               ],
               Text(
                 label,
                 style: TextStyle(
                   fontSize: 13,
-                  fontWeight: FontWeight.w600,
+                  fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
+                  letterSpacing: -0.1,
                   color: fg,
                 ),
               ),
@@ -57,4 +66,3 @@ class AppChoiceChip extends StatelessWidget {
     );
   }
 }
-

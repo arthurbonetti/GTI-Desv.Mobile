@@ -70,6 +70,7 @@ class _HomePageState extends State<HomePage> {
           duration: const Duration(seconds: 5),
           action: SnackBarAction(
             label: 'Desfazer',
+            textColor: const Color(0xFFE8D8B9),
             onPressed: () => _controller.restoreTask(removed),
           ),
           onVisible: () {
@@ -118,7 +119,7 @@ class _HomePageState extends State<HomePage> {
   Widget _buildSortMenu() {
     return PopupMenuButton<TaskSort>(
       tooltip: 'Ordenar',
-      icon: const Icon(Icons.sort_rounded),
+      icon: const Icon(Icons.swap_vert_rounded, size: 22),
       initialValue: _controller.sort,
       onSelected: _controller.setSort,
       itemBuilder: (_) => TaskSort.values
@@ -136,7 +137,7 @@ class _HomePageState extends State<HomePage> {
   Widget _buildMoreMenu() {
     return PopupMenuButton<String>(
       tooltip: 'Mais opções',
-      icon: const Icon(Icons.more_vert_rounded),
+      icon: const Icon(Icons.more_horiz_rounded, size: 22),
       onSelected: (value) {
         if (value == 'clear') _clearCompleted();
       },
@@ -145,8 +146,8 @@ class _HomePageState extends State<HomePage> {
           value: 'clear',
           child: Row(
             children: [
-              Icon(Icons.cleaning_services_outlined, size: 20),
-              SizedBox(width: 12),
+              Icon(Icons.cleaning_services_outlined, size: 19),
+              SizedBox(width: 10),
               Text('Limpar concluídas'),
             ],
           ),
@@ -159,21 +160,89 @@ class _HomePageState extends State<HomePage> {
     return Row(
       children: [
         Text(
-          '$count tarefa(s)  •  ${_controller.sort.label}',
+          '$count ${count == 1 ? 'tarefa' : 'tarefas'}',
           style: const TextStyle(
             fontSize: 13,
-            fontWeight: FontWeight.w600,
-            color: AppColors.textSecondary,
+            fontWeight: FontWeight.w700,
+            letterSpacing: -0.1,
+            color: AppColors.textPrimary,
+          ),
+        ),
+        const SizedBox(width: 8),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+          decoration: BoxDecoration(
+            color: AppColors.surfaceMuted,
+            borderRadius: BorderRadius.circular(5),
+          ),
+          child: Text(
+            'Ordem: ${_controller.sort.label}',
+            style: const TextStyle(
+              fontSize: 11.5,
+              fontWeight: FontWeight.w500,
+              color: AppColors.textSecondary,
+            ),
           ),
         ),
         const Spacer(),
         if (_controller.hasActiveFilters)
           TextButton.icon(
             onPressed: _controller.clearFilters,
-            icon: const Icon(Icons.filter_alt_off_rounded, size: 18),
-            label: const Text('Limpar filtros'),
+            style: TextButton.styleFrom(
+              foregroundColor: AppColors.danger,
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              minimumSize: Size.zero,
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
+            icon: const Icon(Icons.close_rounded, size: 15),
+            label: const Text(
+              'Limpar filtros',
+              style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600),
+            ),
           ),
       ],
+    );
+  }
+
+  Widget _buildFilterButton() {
+    final active = _controller.hasActiveFilters;
+    return Material(
+      color: active ? AppColors.primary : AppColors.surface,
+      borderRadius: BorderRadius.circular(10),
+      child: InkWell(
+        onTap: _openFilterDialog,
+        borderRadius: BorderRadius.circular(10),
+        child: Container(
+          height: 48,
+          padding: const EdgeInsets.symmetric(horizontal: 14),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(
+              color: active ? AppColors.primary : AppColors.border,
+            ),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.tune_rounded,
+                size: 18,
+                color: active ? AppColors.surface : AppColors.textPrimary,
+              ),
+              const SizedBox(width: 6),
+              Text(
+                'Filtrar',
+                style: TextStyle(
+                  fontSize: 13.5,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: -0.1,
+                  color: active ? AppColors.surface : AppColors.textPrimary,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
@@ -192,14 +261,14 @@ class _HomePageState extends State<HomePage> {
                 icon: Icons.checklist_rounded,
                 title: 'Nenhuma tarefa ainda',
                 message:
-                    'Toque em "Nova tarefa" para começar a organizar seu dia.',
+                    'Adicione sua primeira tarefa para organizar as prioridades do dia.',
                 actionLabel: 'Criar tarefa',
                 onAction: () => _openForm(),
               )
             : EmptyState(
                 icon: Icons.search_off_rounded,
                 title: 'Nada encontrado',
-                message: 'Nenhuma tarefa corresponde à busca ou aos filtros.',
+                message: 'Nenhuma tarefa corresponde à busca ou aos filtros ativos.',
                 actionLabel: 'Limpar filtros',
                 onAction: _controller.clearFilters,
               ),
@@ -238,35 +307,7 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
               const SizedBox(width: 8),
-              Stack(
-                alignment: Alignment.topRight,
-                children: [
-                  IconButton.filledTonal(
-                    onPressed: _openFilterDialog,
-                    tooltip: 'Filtros',
-                    icon: const Icon(Icons.tune_rounded),
-                    style: IconButton.styleFrom(
-                      padding: const EdgeInsets.all(14),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                  ),
-                  if (_controller.hasActiveFilters)
-                    Positioned(
-                      top: 4,
-                      right: 4,
-                      child: Container(
-                        width: 10,
-                        height: 10,
-                        decoration: const BoxDecoration(
-                          color: AppColors.primary,
-                          shape: BoxShape.circle,
-                        ),
-                      ),
-                    ),
-                ],
-              ),
+              _buildFilterButton(),
             ],
           ),
           resultsHeader:
@@ -278,4 +319,3 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
-
