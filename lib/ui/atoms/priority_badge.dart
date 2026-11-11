@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../data/models/task.dart';
+import '../core/task_visuals.dart';
 
 /// Átomo: selo com indicador de sinalização para prioridade da tarefa.
 class PriorityBadge extends StatelessWidget {

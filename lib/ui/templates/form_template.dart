@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../atoms/content_constraint.dart';
+
 /// Template: estrutura de uma tela de formulário (AppBar + corpo rolável).
 class FormTemplate extends StatelessWidget {
   const FormTemplate({
@@ -25,7 +27,7 @@ class FormTemplate extends StatelessWidget {
           onTap: () => FocusScope.of(context).unfocus(),
           child: SingleChildScrollView(
             padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
-            child: body,
+            child: ContentConstraint(child: body),
           ),
         ),
       ),

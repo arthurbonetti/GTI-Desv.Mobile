@@ -4,6 +4,7 @@ import '../../controllers/task_controller.dart';
 import '../../core/theme/app_colors.dart';
 import '../../data/models/task.dart';
 import '../atoms/atoms.dart';
+import '../core/task_visuals.dart';
 
 /// Organismo / BottomSheet: painel modal para refinar filtros.
 class FilterBottomSheet extends StatefulWidget {

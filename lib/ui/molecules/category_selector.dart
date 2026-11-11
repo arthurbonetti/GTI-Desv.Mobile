@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../data/models/task.dart';
 import '../atoms/atoms.dart';
+import '../core/task_visuals.dart';
 
 /// Molécula: seletor de categoria (rótulo + grupo de chips).
 class CategorySelector extends StatelessWidget {

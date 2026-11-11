@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../core/theme/app_colors.dart';
 import '../../data/models/task.dart';
+import '../core/task_visuals.dart';
 
 /// Átomo: etiqueta editorial que indica a categoria da tarefa.
 class CategoryTag extends StatelessWidget {

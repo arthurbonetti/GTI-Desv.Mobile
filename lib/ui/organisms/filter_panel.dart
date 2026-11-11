@@ -4,6 +4,7 @@ import '../../controllers/task_controller.dart';
 import '../../core/theme/app_colors.dart';
 import '../../data/models/task.dart';
 import '../molecules/molecules.dart';
+import '../core/task_visuals.dart';
 
 /// Organismo: painel de filtros (status, categoria e prioridade).
 class FilterPanel extends StatelessWidget {

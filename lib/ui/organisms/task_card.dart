@@ -4,6 +4,7 @@ import '../../core/theme/app_colors.dart';
 import '../../data/models/task.dart';
 import '../atoms/atoms.dart';
 import '../molecules/molecules.dart';
+import '../core/task_visuals.dart';
 
 /// Organismo: cartão de tarefa editorial (checkbox tátil + título + metadados),
 /// com gesto de arrastar para excluir.

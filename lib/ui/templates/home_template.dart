@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../core/theme/app_colors.dart';
+import '../atoms/content_constraint.dart';
 
 /// Template: estrutura editorial (layout) da tela inicial, sem regras de negócio.
 /// Recebe os "slots" já montados pela página.
@@ -36,7 +37,8 @@ class HomeTemplate extends StatelessWidget {
       body: SafeArea(
         child: GestureDetector(
           onTap: () => FocusScope.of(context).unfocus(),
-          child: CustomScrollView(
+          child: ContentConstraint(
+            child: CustomScrollView(
             slivers: [
               SliverToBoxAdapter(
                 child: Padding(
@@ -98,6 +100,7 @@ class HomeTemplate extends StatelessWidget {
                 ),
               content,
             ],
+            ),
           ),
         ),
       ),
