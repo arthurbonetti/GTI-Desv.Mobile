@@ -3,8 +3,9 @@ import 'package:flutter/material.dart';
 import '../../controllers/task_controller.dart';
 import '../../core/theme/app_colors.dart';
 import '../../data/models/task.dart';
-import '../templates/templates.dart';
+import '../core/app_feedback.dart';
 import '../organisms/organisms.dart';
+import '../templates/templates.dart';
 
 /// Página: formulário de criação/edição. Conecta o organismo [TaskForm]
 /// ao [TaskController].
@@ -36,45 +37,24 @@ class TaskFormPage extends StatelessWidget {
   Future<void> _confirmDelete(BuildContext context) async {
     final navigator = Navigator.of(context);
     final messenger = ScaffoldMessenger.of(context);
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Excluir tarefa'),
-        content: Text('Deseja realmente excluir "${task!.title}"?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Cancelar'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, true),
-            style: TextButton.styleFrom(foregroundColor: AppColors.danger),
-            child: const Text('Excluir'),
-          ),
-        ],
-      ),
+    final currentTask = task;
+    if (currentTask == null) return;
+
+    final confirmed = await showConfirmDeleteDialog(
+      context,
+      title: 'Excluir tarefa',
+      message: 'Deseja realmente excluir "${currentTask.title}"?',
     );
-    if (confirmed != true) return;
-    final removed = await controller.deleteTask(task!.id);
+    if (!confirmed) return;
+
+    final removed = await controller.deleteTask(currentTask.id);
     navigator.pop();
     if (removed != null) {
-      messenger
-        ..hideCurrentSnackBar()
-        ..showSnackBar(
-          SnackBar(
-            content: const Text('Tarefa excluída'),
-            duration: const Duration(seconds: 5),
-            action: SnackBarAction(
-              label: 'Desfazer',
-              onPressed: () => controller.restoreTask(removed),
-            ),
-            onVisible: () {
-              Future.delayed(const Duration(seconds: 5), () {
-                messenger.hideCurrentSnackBar();
-              });
-            },
-          ),
-        );
+      showUndoDeleteSnackBar(
+        messenger,
+        message: 'Tarefa excluída',
+        onUndo: () => controller.restoreTask(removed),
+      );
     }
   }
 
@@ -98,4 +78,3 @@ class TaskFormPage extends StatelessWidget {
     );
   }
 }
-

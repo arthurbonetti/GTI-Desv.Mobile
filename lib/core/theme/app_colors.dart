@@ -42,4 +42,5 @@ class AppColors {
   // Status
   static const Color success = Color(0xFF2E6B56);
   static const Color danger = Color(0xFFC83A2B);
+  static const Color snackBarAction = Color(0xFFE8D8B9);
 }

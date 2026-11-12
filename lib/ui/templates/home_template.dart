@@ -9,10 +9,8 @@ class HomeTemplate extends StatelessWidget {
   const HomeTemplate({
     super.key,
     required this.title,
-    this.subtitle,
     required this.stats,
     required this.search,
-    this.filters,
     required this.content,
     required this.onAdd,
     this.actions = const [],
@@ -20,10 +18,8 @@ class HomeTemplate extends StatelessWidget {
   });
 
   final String title;
-  final String? subtitle;
   final Widget stats;
   final Widget search;
-  final Widget? filters;
 
   /// Deve ser um Sliver (ex.: lista de tarefas ou SliverFillRemaining).
   final Widget content;
@@ -39,67 +35,50 @@ class HomeTemplate extends StatelessWidget {
           onTap: () => FocusScope.of(context).unfocus(),
           child: ContentConstraint(
             child: CustomScrollView(
-            slivers: [
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 20, 12, 0),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            if (subtitle != null && subtitle!.isNotEmpty) ...[
-                              Text(
-                                subtitle!,
-                                style: const TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w500,
-                                  color: AppColors.textSecondary,
-                                ),
-                              ),
-                              const SizedBox(height: 2),
-                            ],
-                            Text(
-                              title,
-                              style: const TextStyle(
-                                fontSize: 26,
-                                height: 1.1,
-                                letterSpacing: -0.7,
-                                fontWeight: FontWeight.w800,
-                                color: AppColors.textPrimary,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      ...actions,
-                    ],
-                  ),
-                ),
-              ),
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 18, 20, 0),
-                  child: stats,
-                ),
-              ),
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 14, 20, 8),
-                  child: search,
-                ),
-              ),
-              if (filters != null) SliverToBoxAdapter(child: filters!),
-              if (resultsHeader != null)
+              slivers: [
                 SliverToBoxAdapter(
                   child: Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 14, 20, 6),
-                    child: resultsHeader,
+                    padding: const EdgeInsets.fromLTRB(20, 20, 12, 0),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            title,
+                            style: const TextStyle(
+                              fontSize: 26,
+                              height: 1.1,
+                              letterSpacing: -0.7,
+                              fontWeight: FontWeight.w800,
+                              color: AppColors.textPrimary,
+                            ),
+                          ),
+                        ),
+                        ...actions,
+                      ],
+                    ),
                   ),
                 ),
-              content,
-            ],
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 18, 20, 0),
+                    child: stats,
+                  ),
+                ),
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 14, 20, 8),
+                    child: search,
+                  ),
+                ),
+                if (resultsHeader != null)
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(20, 14, 20, 6),
+                      child: resultsHeader,
+                    ),
+                  ),
+                content,
+              ],
             ),
           ),
         ),

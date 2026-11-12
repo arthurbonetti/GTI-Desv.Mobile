@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/task.dart';
@@ -20,11 +21,21 @@ class LocalTaskRepository implements TaskRepository {
     final raw = prefs.getString(_storageKey);
     if (raw == null || raw.isEmpty) return [];
     try {
-      final decoded = jsonDecode(raw) as List<dynamic>;
-      return decoded
-          .map((e) => Task.fromJson(e as Map<String, dynamic>))
-          .toList();
-    } catch (_) {
+      final decoded = jsonDecode(raw);
+      if (decoded is! List) return [];
+      final tasks = <Task>[];
+      for (final item in decoded) {
+        if (item is Map<String, dynamic>) {
+          try {
+            tasks.add(Task.fromJson(item));
+          } catch (e) {
+            debugPrint('Ignorando tarefa inválida no armazenamento local: $e');
+          }
+        }
+      }
+      return tasks;
+    } catch (e) {
+      debugPrint('Erro ao decodificar tarefas do armazenamento local: $e');
       return [];
     }
   }

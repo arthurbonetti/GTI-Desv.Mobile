@@ -1,20 +1,24 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../../core/theme/app_colors.dart';
 import '../atoms/atoms.dart';
 
-/// Molécula: campo de busca (AppTextField + ícone + botão limpar).
+/// Molécula: campo de busca (AppTextField + ícone + botão limpar com debounce).
 class SearchField extends StatefulWidget {
   const SearchField({
     super.key,
     required this.onChanged,
     this.initialValue = '',
     this.hint = 'Buscar tarefas...',
+    this.debounceDuration = const Duration(milliseconds: 220),
   });
 
   final ValueChanged<String> onChanged;
   final String initialValue;
   final String hint;
+  final Duration debounceDuration;
 
   @override
   State<SearchField> createState() => _SearchFieldState();
@@ -23,6 +27,7 @@ class SearchField extends StatefulWidget {
 class _SearchFieldState extends State<SearchField> {
   late final TextEditingController _controller =
       TextEditingController(text: widget.initialValue);
+  Timer? _debounce;
 
   @override
   void didUpdateWidget(covariant SearchField oldWidget) {
@@ -30,17 +35,28 @@ class _SearchFieldState extends State<SearchField> {
     // Sincroniza quando os filtros são limpos externamente.
     if (widget.initialValue != _controller.text &&
         widget.initialValue.isEmpty) {
+      _debounce?.cancel();
       _controller.clear();
     }
   }
 
   @override
   void dispose() {
+    _debounce?.cancel();
     _controller.dispose();
     super.dispose();
   }
 
+  void _onChanged(String value) {
+    setState(() {});
+    _debounce?.cancel();
+    _debounce = Timer(widget.debounceDuration, () {
+      widget.onChanged(value);
+    });
+  }
+
   void _clear() {
+    _debounce?.cancel();
     _controller.clear();
     widget.onChanged('');
     setState(() {});
@@ -53,10 +69,7 @@ class _SearchFieldState extends State<SearchField> {
       hint: widget.hint,
       prefixIcon: Icons.search_rounded,
       textInputAction: TextInputAction.search,
-      onChanged: (value) {
-        widget.onChanged(value);
-        setState(() {});
-      },
+      onChanged: _onChanged,
       suffix: _controller.text.isEmpty
           ? null
           : IconButton(

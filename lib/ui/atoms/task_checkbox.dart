@@ -8,12 +8,14 @@ class TaskCheckbox extends StatelessWidget {
     super.key,
     required this.value,
     required this.onChanged,
+    this.semanticLabel,
     this.activeColor = AppColors.primary,
     this.borderColor = AppColors.borderStrong,
   });
 
   final bool value;
   final VoidCallback onChanged;
+  final String? semanticLabel;
   final Color activeColor;
   final Color borderColor;
 
@@ -22,9 +24,10 @@ class TaskCheckbox extends StatelessWidget {
     return Semantics(
       checked: value,
       button: true,
+      label: semanticLabel,
       child: InkResponse(
         onTap: onChanged,
-        radius: 20,
+        radius: 22,
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 160),
           curve: Curves.easeOutCubic,

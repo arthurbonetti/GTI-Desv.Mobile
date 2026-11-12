@@ -52,8 +52,11 @@ class TaskQuery {
   final TaskPriority? priority;
   final TaskSort sort;
 
-  bool get hasActiveFilters =>
-      text.isNotEmpty ||
+  /// Indica se há busca ou filtros ativos.
+  bool get hasActiveFilters => text.trim().isNotEmpty || hasFacetFilters;
+
+  /// Indica se há filtros do painel (status, categoria ou prioridade) ativos.
+  bool get hasFacetFilters =>
       status != TaskStatusFilter.todas ||
       category != null ||
       priority != null;
@@ -102,11 +105,11 @@ class TaskQuery {
   }
 
   bool _matchesText(Task task) {
-    final needle = text.trim().toLowerCase();
+    final needle = normalizeSearchText(text);
     if (needle.isEmpty) return true;
-    return task.title.toLowerCase().contains(needle) ||
-        task.description.toLowerCase().contains(needle) ||
-        task.category.label.toLowerCase().contains(needle);
+    return normalizeSearchText(task.title).contains(needle) ||
+        normalizeSearchText(task.description).contains(needle) ||
+        normalizeSearchText(task.category.label).contains(needle);
   }
 
   int _compare(Task a, Task b) {
@@ -120,7 +123,8 @@ class TaskQuery {
       case TaskSort.recentes:
         return b.createdAt.compareTo(a.createdAt);
       case TaskSort.alfabetica:
-        return a.title.toLowerCase().compareTo(b.title.toLowerCase());
+        return normalizeSearchText(a.title)
+            .compareTo(normalizeSearchText(b.title));
     }
   }
 
@@ -149,4 +153,33 @@ class TaskQuery {
     if (bDue == null) return -1;
     return aDue.compareTo(bDue);
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is TaskQuery &&
+        other.text == text &&
+        other.status == status &&
+        other.category == category &&
+        other.priority == priority &&
+        other.sort == sort;
+  }
+
+  @override
+  int get hashCode => Object.hash(text, status, category, priority, sort);
+}
+
+/// Remove espaços extras, converte para minúsculas e normaliza acentos comuns
+/// do português para buscas e ordenação alfabética consistentes.
+String normalizeSearchText(String input) {
+  const accents = 'áàâãäéèêëíìîïóòôõöúùûüçñ';
+  const plain = 'aaaaaeeeeiiiiooooouuuucn';
+  final lower = input.trim().toLowerCase();
+  final buffer = StringBuffer();
+  for (var i = 0; i < lower.length; i++) {
+    final ch = lower[i];
+    final idx = accents.indexOf(ch);
+    buffer.write(idx >= 0 ? plain[idx] : ch);
+  }
+  return buffer.toString();
 }

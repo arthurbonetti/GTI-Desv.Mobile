@@ -68,40 +68,38 @@ class TaskCard extends StatelessWidget {
                     : AppColors.border,
               ),
             ),
-            child: IntrinsicHeight(
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(11),
+              child: Stack(
                 children: [
-                  // Filete de sinalização lateral com a cor da prioridade.
-                  Container(
-                    width: 3.5,
-                    decoration: BoxDecoration(
-                      color: completed
-                          ? AppColors.border
-                          : task.priority.color,
-                      borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(12),
-                        bottomLeft: Radius.circular(12),
-                      ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(17.5, 14, 14, 14),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(top: 1),
+                          child: TaskCheckbox(
+                            value: completed,
+                            onChanged: onToggle,
+                            semanticLabel: completed
+                                ? 'Marcar "${task.title}" como pendente'
+                                : 'Marcar "${task.title}" como concluída',
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(child: _buildContent(completed)),
+                      ],
                     ),
                   ),
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(14, 14, 14, 14),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(top: 1),
-                            child: TaskCheckbox(
-                              value: completed,
-                              onChanged: onToggle,
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(child: _buildContent(completed)),
-                        ],
-                      ),
+                  // Filete de sinalização lateral com a cor da prioridade.
+                  Positioned(
+                    left: 0,
+                    top: 0,
+                    bottom: 0,
+                    width: 3.5,
+                    child: ColoredBox(
+                      color: completed ? AppColors.border : task.priority.color,
                     ),
                   ),
                 ],

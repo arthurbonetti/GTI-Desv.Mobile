@@ -136,5 +136,37 @@ class Task {
           : null,
     );
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is Task &&
+        other.id == id &&
+        other.title == title &&
+        other.description == description &&
+        other.category == category &&
+        other.priority == priority &&
+        other.isCompleted == isCompleted &&
+        other.createdAt == createdAt &&
+        other.dueDate == dueDate &&
+        other.completedAt == completedAt;
+  }
+
+  @override
+  int get hashCode => Object.hash(
+        id,
+        title,
+        description,
+        category,
+        priority,
+        isCompleted,
+        createdAt,
+        dueDate,
+        completedAt,
+      );
+
+  @override
+  String toString() =>
+      'Task(id: $id, title: $title, category: ${category.name}, priority: ${priority.name}, isCompleted: $isCompleted)';
 }
 

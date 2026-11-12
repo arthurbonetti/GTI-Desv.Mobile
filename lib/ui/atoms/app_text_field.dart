@@ -41,10 +41,30 @@ class AppTextField extends StatelessWidget {
       textInputAction: textInputAction,
       textCapitalization: TextCapitalization.sentences,
       style: const TextStyle(fontSize: 15, color: AppColors.textPrimary),
+      buildCounter: maxLength == null
+          ? null
+          : (
+              context, {
+              required currentLength,
+              required isFocused,
+              required maxLength,
+            }) {
+              if (maxLength == null || currentLength < (maxLength * 0.85)) {
+                return null;
+              }
+              return Text(
+                '$currentLength/$maxLength',
+                style: TextStyle(
+                  fontSize: 11,
+                  color: currentLength >= maxLength
+                      ? AppColors.danger
+                      : AppColors.textMuted,
+                ),
+              );
+            },
       decoration: InputDecoration(
         hintText: hint,
         hintStyle: const TextStyle(color: AppColors.textMuted),
-        counterText: '',
         prefixIcon: prefixIcon != null
             ? Icon(prefixIcon, color: AppColors.textSecondary)
             : null,

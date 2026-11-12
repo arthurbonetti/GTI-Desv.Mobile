@@ -1,6 +1,11 @@
+import 'dart:convert';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gerenciador_tarefas_inteligente/controllers/task_controller.dart';
+import 'package:gerenciador_tarefas_inteligente/core/utils/date_utils.dart';
 import 'package:gerenciador_tarefas_inteligente/data/models/task.dart';
+import 'package:gerenciador_tarefas_inteligente/data/repositories/task_repository.dart';
+import 'package:gerenciador_tarefas_inteligente/domain/task_suggestion.dart';
 import 'package:gerenciador_tarefas_inteligente/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -22,22 +27,30 @@ Task _task(
       dueDate: due,
     );
 
+class _FailingLoadRepository implements TaskRepository {
+  @override
+  Future<List<Task>> loadTasks() async => throw Exception('Erro de leitura');
+
+  @override
+  Future<void> saveTasks(List<Task> tasks) async {}
+}
+
 void main() {
   setUp(() => SharedPreferences.setMockInitialValues({}));
 
-  test('Task serializa e desserializa corretamente', () {
+  test('Task serializa, desserializa e compara por valor corretamente', () {
     final t = _task('1', 'Estudar',
         category: TaskCategory.estudo, priority: TaskPriority.alta);
     final copy = Task.fromJson(t.toJson());
-    expect(copy.title, 'Estudar');
-    expect(copy.category, TaskCategory.estudo);
-    expect(copy.priority, TaskPriority.alta);
+    expect(copy, t);
+    expect(copy.hashCode, t.hashCode);
   });
 
-  test('CRUD, filtros e persistência', () async {
+  test('CRUD, filtros, busca sem acento e persistência', () async {
     final c = TaskController();
     await c.load();
-    await c.addTask(_task('1', 'Relatório', category: TaskCategory.trabalho));
+    await c.addTask(_task('1', 'Reunião com cliente',
+        category: TaskCategory.trabalho));
     await c.addTask(_task('2', 'Prova', priority: TaskPriority.alta));
     await c.addTask(_task('3', 'Mercado', priority: TaskPriority.baixa));
 
@@ -49,14 +62,17 @@ void main() {
     expect(c.filteredTasks.last.title, 'Prova');
 
     c.setStatusFilter(TaskStatusFilter.pendentes);
+    expect(c.hasFacetFilters, isTrue);
     expect(c.filteredTasks.length, 2);
 
     c.setCategoryFilter(TaskCategory.trabalho);
-    expect(c.filteredTasks.single.title, 'Relatório');
+    expect(c.filteredTasks.single.title, 'Reunião com cliente');
 
     c.clearFilters();
-    c.setQuery('merc');
-    expect(c.filteredTasks.single.title, 'Mercado');
+    c.setQuery('reuniao');
+    expect(c.hasActiveFilters, isTrue);
+    expect(c.hasFacetFilters, isFalse);
+    expect(c.filteredTasks.single.title, 'Reunião com cliente');
 
     await c.deleteTask('3');
     expect(c.totalCount, 2);
@@ -67,6 +83,53 @@ void main() {
     expect(c2.totalCount, 2);
   });
 
+  test('LocalTaskRepository ignora item corrompido sem perder tarefas válidas',
+      () async {
+    final valid = _task('1', 'Válida');
+    SharedPreferences.setMockInitialValues({
+      'gti_tasks_v1': jsonEncode([
+        valid.toJson(),
+        {'id': '2', 'title': 'Quebrada', 'createdAt': 'data-invalida'},
+      ]),
+    });
+
+    final repo = LocalTaskRepository();
+    final loaded = await repo.loadTasks();
+    expect(loaded, [valid]);
+  });
+
+  test('TaskController.load encerra isLoading mesmo se repositório falhar',
+      () async {
+    final c = TaskController(repository: _FailingLoadRepository());
+    await expectLater(c.load(), throwsException);
+    expect(c.isLoading, isFalse);
+  });
+
+  test('TaskSuggestion infere categoria e prioridade ignorando acentos', () {
+    final s1 = TaskSuggestion.fromTitle('Pagar boleto urgente');
+    expect(s1.category, TaskCategory.financas);
+    expect(s1.priority, TaskPriority.alta);
+
+    final s2 = TaskSuggestion.fromTitle('Reuniao sobre relatorio');
+    expect(s2.category, TaskCategory.trabalho);
+    expect(s2.priority, isNull);
+  });
+
+  test('AppDateUtils calcula rótulos relativos corretamente', () {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    expect(AppDateUtils.daysFromToday(today), 0);
+    expect(AppDateUtils.relativeLabel(today), 'Hoje');
+    expect(
+      AppDateUtils.relativeLabel(today.add(const Duration(days: 1))),
+      'Amanhã',
+    );
+    expect(
+      AppDateUtils.relativeLabel(today.subtract(const Duration(days: 1))),
+      'Ontem',
+    );
+  });
+
   testWidgets('Home exibe estado vazio', (tester) async {
     await tester.pumpWidget(const GerenciadorTarefasApp());
     await tester.pumpAndSettle();
@@ -74,4 +137,3 @@ void main() {
     expect(find.text('Nenhuma tarefa ainda'), findsOneWidget);
   });
 }
-

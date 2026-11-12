@@ -7,18 +7,14 @@ import '../molecules/molecules.dart';
 class StatsOverview extends StatelessWidget {
   const StatsOverview({
     super.key,
-    required this.total,
     required this.pending,
     required this.completed,
     required this.overdue,
-    required this.progress,
   });
 
-  final int total;
   final int pending;
   final int completed;
   final int overdue;
-  final double progress;
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +31,6 @@ class StatsOverview extends StatelessWidget {
               child: StatTile(
                 label: 'Pendentes',
                 value: pending,
-                icon: Icons.pending_actions_rounded,
                 color: AppColors.primary,
               ),
             ),
@@ -44,7 +39,6 @@ class StatsOverview extends StatelessWidget {
               child: StatTile(
                 label: 'Concluídas',
                 value: completed,
-                icon: Icons.task_alt_rounded,
                 color: AppColors.success,
               ),
             ),
@@ -53,7 +47,6 @@ class StatsOverview extends StatelessWidget {
               child: StatTile(
                 label: 'Atrasadas',
                 value: overdue,
-                icon: Icons.warning_amber_rounded,
                 color: AppColors.danger,
               ),
             ),

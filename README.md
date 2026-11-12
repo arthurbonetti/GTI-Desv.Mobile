@@ -15,19 +15,21 @@ App Flutter de gerenciamento de tarefas construído com a metodologia **Atomic D
   - Sugestão automática de categoria/prioridade a partir do título
     (ex.: "Pagar boleto **urgente**" → Finanças / Alta)
   - Data de vencimento com alertas de atraso
-  - Painel com progresso e estatísticas
+  - Painel com estatísticas (pendentes, concluídas e atrasadas)
 
-## Arquitetura (Atomic Design)
+## Arquitetura (Atomic Design + Camadas)
 
 ```
 lib/
 ├── core/            # Tema (design tokens) e utilitários
-├── data/            # Modelos e repositório (persistência)
+├── data/            # Modelos e repositório (persistência local)
+├── domain/          # Regras puras (busca/filtro/ordenação e sugestões)
 ├── controllers/     # Estado (ChangeNotifier)
 └── ui/
+    ├── core/        # Apresentação visual de enums e feedbacks compartilhados
     ├── atoms/       # AppButton, AppTextField, PriorityBadge, CategoryTag, TaskCheckbox...
-    ├── molecules/   # SearchField, StatTile, CategorySelector, PrioritySelector, EmptyState...
-    ├── organisms/   # TaskCard, TaskSliverList, FilterPanel, StatsOverview, TaskForm
+    ├── molecules/   # SearchField, StatTile, FilterButton, ResultsHeader, EmptyState...
+    ├── organisms/   # TaskCard, TaskSliverList, FilterBottomSheet, StatsOverview, TaskForm
     ├── templates/   # HomeTemplate, FormTemplate (layout sem regra de negócio)
     └── pages/       # HomePage, TaskFormPage (conectam templates ao estado)
 ```
@@ -35,11 +37,7 @@ lib/
 ## Como executar
 
 ```bash
-flutter create . --project-name gerenciador_tarefas_inteligente --platforms=android,ios,web
 flutter pub get
 flutter run
 flutter test
 ```
-
-> O comando `flutter create .` apenas gera as pastas de plataforma (android/ios/web);
-> os arquivos já existentes em `lib/` e `test/` são preservados.

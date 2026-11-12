@@ -64,133 +64,139 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final maxHeight = MediaQuery.sizeOf(context).height * 0.88;
     return Container(
-      constraints: const BoxConstraints(maxWidth: 520),
+      constraints: BoxConstraints(maxWidth: 520, maxHeight: maxHeight),
       decoration: const BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.vertical(top: Radius.circular(18)),
         border: Border(top: BorderSide(color: AppColors.border)),
       ),
-      padding: EdgeInsets.fromLTRB(
-        20,
-        12,
-        20,
-        MediaQuery.of(context).viewInsets.bottom + 24,
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Center(
-            child: Container(
-              width: 36,
-              height: 4,
-              decoration: BoxDecoration(
-                color: AppColors.borderStrong,
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
+      child: SafeArea(
+        top: false,
+        child: SingleChildScrollView(
+          padding: EdgeInsets.fromLTRB(
+            20,
+            12,
+            20,
+            MediaQuery.of(context).viewInsets.bottom + 24,
           ),
-          const SizedBox(height: 16),
-          Row(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'Filtrar tarefas',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: -0.3,
-                  color: AppColors.textPrimary,
+              Center(
+                child: Container(
+                  width: 36,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: AppColors.borderStrong,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
                 ),
               ),
-              const Spacer(),
-              TextButton(
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  const Text(
+                    'Filtrar tarefas',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: -0.3,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                  const Spacer(),
+                  TextButton(
+                    onPressed: () {
+                      setState(() {
+                        _status = TaskStatusFilter.todas;
+                        _category = null;
+                        _priority = null;
+                      });
+                      widget.onClear();
+                      Navigator.pop(context);
+                    },
+                    style: TextButton.styleFrom(
+                      foregroundColor: AppColors.textSecondary,
+                    ),
+                    child: const Text('Redefinir'),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              const Divider(height: 20),
+              const SectionLabel('Status'),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: TaskStatusFilter.values.map((s) {
+                  return AppChoiceChip(
+                    label: s.label,
+                    selected: _status == s,
+                    onTap: () => setState(() => _status = s),
+                  );
+                }).toList(),
+              ),
+              const SizedBox(height: 18),
+              const SectionLabel('Categoria'),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  AppChoiceChip(
+                    label: 'Todas',
+                    selected: _category == null,
+                    onTap: () => setState(() => _category = null),
+                  ),
+                  ...TaskCategory.values.map((c) {
+                    return AppChoiceChip(
+                      label: c.label,
+                      icon: c.icon,
+                      color: c.color,
+                      selected: _category == c,
+                      onTap: () =>
+                          setState(() => _category = _category == c ? null : c),
+                    );
+                  }),
+                ],
+              ),
+              const SizedBox(height: 18),
+              const SectionLabel('Prioridade'),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  AppChoiceChip(
+                    label: 'Todas',
+                    selected: _priority == null,
+                    onTap: () => setState(() => _priority = null),
+                  ),
+                  ...TaskPriority.values.map((p) {
+                    return AppChoiceChip(
+                      label: p.label,
+                      icon: Icons.flag_rounded,
+                      color: p.color,
+                      selected: _priority == p,
+                      onTap: () =>
+                          setState(() => _priority = _priority == p ? null : p),
+                    );
+                  }),
+                ],
+              ),
+              const SizedBox(height: 26),
+              AppButton(
+                label: 'Ver resultados',
+                icon: Icons.check_rounded,
                 onPressed: () {
-                  setState(() {
-                    _status = TaskStatusFilter.todas;
-                    _category = null;
-                    _priority = null;
-                  });
-                  widget.onClear();
+                  widget.onApply(_status, _category, _priority);
                   Navigator.pop(context);
                 },
-                style: TextButton.styleFrom(
-                  foregroundColor: AppColors.textSecondary,
-                ),
-                child: const Text('Redefinir'),
               ),
             ],
           ),
-          const SizedBox(height: 8),
-          const Divider(height: 20),
-          const SectionLabel('Status'),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: TaskStatusFilter.values.map((s) {
-              return AppChoiceChip(
-                label: s.label,
-                selected: _status == s,
-                onTap: () => setState(() => _status = s),
-              );
-            }).toList(),
-          ),
-          const SizedBox(height: 18),
-          const SectionLabel('Categoria'),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: [
-              AppChoiceChip(
-                label: 'Todas',
-                selected: _category == null,
-                onTap: () => setState(() => _category = null),
-              ),
-              ...TaskCategory.values.map((c) {
-                return AppChoiceChip(
-                  label: c.label,
-                  icon: c.icon,
-                  color: c.color,
-                  selected: _category == c,
-                  onTap: () =>
-                      setState(() => _category = _category == c ? null : c),
-                );
-              }),
-            ],
-          ),
-          const SizedBox(height: 18),
-          const SectionLabel('Prioridade'),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: [
-              AppChoiceChip(
-                label: 'Todas',
-                selected: _priority == null,
-                onTap: () => setState(() => _priority = null),
-              ),
-              ...TaskPriority.values.map((p) {
-                return AppChoiceChip(
-                  label: p.label,
-                  icon: Icons.flag_rounded,
-                  color: p.color,
-                  selected: _priority == p,
-                  onTap: () =>
-                      setState(() => _priority = _priority == p ? null : p),
-                );
-              }),
-            ],
-          ),
-          const SizedBox(height: 26),
-          AppButton(
-            label: 'Ver resultados',
-            icon: Icons.check_rounded,
-            onPressed: () {
-              widget.onApply(_status, _category, _priority);
-              Navigator.pop(context);
-            },
-          ),
-        ],
+        ),
       ),
     );
   }

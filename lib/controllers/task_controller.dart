@@ -26,12 +26,12 @@ class TaskController extends ChangeNotifier {
   TaskPriority? get priorityFilter => _query.priority;
   TaskSort get sort => _query.sort;
   bool get hasActiveFilters => _query.hasActiveFilters;
+  bool get hasFacetFilters => _query.hasFacetFilters;
 
   int get totalCount => _tasks.length;
   int get completedCount => _tasks.where((t) => t.isCompleted).length;
   int get pendingCount => totalCount - completedCount;
   int get overdueCount => _tasks.where((t) => t.isOverdue).length;
-  double get progress => totalCount == 0 ? 0 : completedCount / totalCount;
 
   List<Task> get filteredTasks => _query.apply(_tasks);
 
@@ -39,9 +39,12 @@ class TaskController extends ChangeNotifier {
   Future<void> load() async {
     _isLoading = true;
     notifyListeners();
-    _tasks = await _repository.loadTasks();
-    _isLoading = false;
-    notifyListeners();
+    try {
+      _tasks = await _repository.loadTasks();
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
   }
 
   Future<void> addTask(Task task) => _commit([..._tasks, task]);

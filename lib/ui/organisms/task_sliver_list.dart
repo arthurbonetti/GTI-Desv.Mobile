@@ -27,49 +27,19 @@ class TaskSliverList extends StatelessWidget {
           (context, index) {
             final task = tasks[index];
             return Padding(
+              key: ValueKey(task.id),
               padding: const EdgeInsets.only(bottom: 12),
-              child: _FadeSlideIn(
-                key: ValueKey(task.id),
-                child: TaskCard(
-                  task: task,
-                  onToggle: () => onToggle(task),
-                  onTap: () => onTap(task),
-                  onDelete: () => onDelete(task),
-                ),
+              child: TaskCard(
+                task: task,
+                onToggle: () => onToggle(task),
+                onTap: () => onTap(task),
+                onDelete: () => onDelete(task),
               ),
             );
           },
           childCount: tasks.length,
         ),
       ),
-    );
-  }
-}
-
-
-/// Entrada suave (fade + leve deslocamento) de um item da lista.
-class _FadeSlideIn extends StatelessWidget {
-  const _FadeSlideIn({super.key, required this.child});
-
-  final Widget child;
-
-  static const Duration _duration = Duration(milliseconds: 280);
-  static const double _slideOffset = 12;
-
-  @override
-  Widget build(BuildContext context) {
-    return TweenAnimationBuilder<double>(
-      tween: Tween(begin: 0, end: 1),
-      duration: _duration,
-      curve: Curves.easeOutCubic,
-      builder: (context, value, child) => Opacity(
-        opacity: value,
-        child: Transform.translate(
-          offset: Offset(0, (1 - value) * _slideOffset),
-          child: child,
-        ),
-      ),
-      child: child,
     );
   }
 }

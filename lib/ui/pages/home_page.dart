@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../../controllers/task_controller.dart';
-import '../../core/theme/app_colors.dart';
 import '../../data/models/task.dart';
+import '../core/app_feedback.dart';
 import '../molecules/molecules.dart';
 import '../organisms/organisms.dart';
 import '../templates/templates.dart';
@@ -62,28 +62,16 @@ class _HomePageState extends State<HomePage> {
     final messenger = ScaffoldMessenger.of(context);
     final removed = await _controller.deleteTask(task.id);
     if (removed == null) return;
-    messenger
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
-        SnackBar(
-          content: Text('"${removed.title}" excluída'),
-          duration: const Duration(seconds: 5),
-          action: SnackBarAction(
-            label: 'Desfazer',
-            textColor: const Color(0xFFE8D8B9),
-            onPressed: () => _controller.restoreTask(removed),
-          ),
-          onVisible: () {
-            Future.delayed(const Duration(seconds: 5), () {
-              messenger.hideCurrentSnackBar();
-            });
-          },
-        ),
-      );
+    showUndoDeleteSnackBar(
+      messenger,
+      message: '"${removed.title}" excluída',
+      onUndo: () => _controller.restoreTask(removed),
+    );
   }
 
   Future<void> _clearCompleted() async {
-    if (_controller.completedCount == 0) {
+    final completedCount = _controller.completedCount;
+    if (completedCount == 0) {
       ScaffoldMessenger.of(context)
         ..hideCurrentSnackBar()
         ..showSnackBar(
@@ -94,26 +82,12 @@ class _HomePageState extends State<HomePage> {
         );
       return;
     }
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Limpar concluídas'),
-        content: Text(
-            'Excluir ${_controller.completedCount} tarefa(s) concluída(s)?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Cancelar'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, true),
-            style: TextButton.styleFrom(foregroundColor: AppColors.danger),
-            child: const Text('Excluir'),
-          ),
-        ],
-      ),
+    final confirmed = await showConfirmDeleteDialog(
+      context,
+      title: 'Limpar concluídas',
+      message: 'Excluir $completedCount tarefa(s) concluída(s)?',
     );
-    if (confirmed == true) await _controller.clearCompleted();
+    if (confirmed) await _controller.clearCompleted();
   }
 
   Widget _buildSortMenu() {
@@ -153,96 +127,6 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildResultsHeader(int count) {
-    return Row(
-      children: [
-        Text(
-          '$count ${count == 1 ? 'tarefa' : 'tarefas'}',
-          style: const TextStyle(
-            fontSize: 13,
-            fontWeight: FontWeight.w700,
-            letterSpacing: -0.1,
-            color: AppColors.textPrimary,
-          ),
-        ),
-        const SizedBox(width: 8),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
-          decoration: BoxDecoration(
-            color: AppColors.surfaceMuted,
-            borderRadius: BorderRadius.circular(5),
-          ),
-          child: Text(
-            'Ordem: ${_controller.sort.label}',
-            style: const TextStyle(
-              fontSize: 11.5,
-              fontWeight: FontWeight.w500,
-              color: AppColors.textSecondary,
-            ),
-          ),
-        ),
-        const Spacer(),
-        if (_controller.hasActiveFilters)
-          TextButton.icon(
-            onPressed: _controller.clearFilters,
-            style: TextButton.styleFrom(
-              foregroundColor: AppColors.danger,
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              minimumSize: Size.zero,
-              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-            ),
-            icon: const Icon(Icons.close_rounded, size: 15),
-            label: const Text(
-              'Limpar filtros',
-              style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600),
-            ),
-          ),
-      ],
-    );
-  }
-
-  Widget _buildFilterButton() {
-    final active = _controller.hasActiveFilters;
-    return Material(
-      color: active ? AppColors.primary : AppColors.surface,
-      borderRadius: BorderRadius.circular(10),
-      child: InkWell(
-        onTap: _openFilterDialog,
-        borderRadius: BorderRadius.circular(10),
-        child: Container(
-          height: 48,
-          padding: const EdgeInsets.symmetric(horizontal: 14),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(
-              color: active ? AppColors.primary : AppColors.border,
-            ),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                Icons.tune_rounded,
-                size: 18,
-                color: active ? AppColors.surface : AppColors.textPrimary,
-              ),
-              const SizedBox(width: 6),
-              Text(
-                'Filtrar',
-                style: TextStyle(
-                  fontSize: 13.5,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: -0.1,
-                  color: active ? AppColors.surface : AppColors.textPrimary,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
     );
   }
 
@@ -292,11 +176,9 @@ class _HomePageState extends State<HomePage> {
           title: 'Minhas Tarefas',
           actions: [_buildSortMenu(), _buildMoreMenu()],
           stats: StatsOverview(
-            total: _controller.totalCount,
             pending: _controller.pendingCount,
             completed: _controller.completedCount,
             overdue: _controller.overdueCount,
-            progress: _controller.progress,
           ),
           search: Row(
             children: [
@@ -307,11 +189,20 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
               const SizedBox(width: 8),
-              _buildFilterButton(),
+              FilterButton(
+                active: _controller.hasFacetFilters,
+                onTap: _openFilterDialog,
+              ),
             ],
           ),
-          resultsHeader:
-              _controller.isLoading ? null : _buildResultsHeader(tasks.length),
+          resultsHeader: _controller.isLoading
+              ? null
+              : ResultsHeader(
+                  count: tasks.length,
+                  sortLabel: _controller.sort.label,
+                  hasActiveFilters: _controller.hasActiveFilters,
+                  onClearFilters: _controller.clearFilters,
+                ),
           content: _buildContent(tasks),
           onAdd: () => _openForm(),
         );

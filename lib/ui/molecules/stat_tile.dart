@@ -8,13 +8,11 @@ class StatTile extends StatelessWidget {
     super.key,
     required this.label,
     required this.value,
-    required this.icon,
     required this.color,
   });
 
   final String label;
   final int value;
-  final IconData icon;
   final Color color;
 
   @override

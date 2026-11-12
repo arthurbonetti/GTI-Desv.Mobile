@@ -10,10 +10,15 @@ class AppDateUtils {
     return '$day/$month/${d.year}';
   }
 
-  /// Diferença em dias entre [d] e hoje (negativo = passado).
+  /// Diferença em dias calendário entre [d] e hoje (negativo = passado).
+  ///
+  /// Usa UTC para evitar truncamento incorreto de `inDays` em transições de
+  /// horário de verão (dias com 23h ou 25h).
   static int daysFromToday(DateTime d) {
-    final today = onlyDate(DateTime.now());
-    return onlyDate(d).difference(today).inDays;
+    final now = DateTime.now();
+    final todayUtc = DateTime.utc(now.year, now.month, now.day);
+    final targetUtc = DateTime.utc(d.year, d.month, d.day);
+    return targetUtc.difference(todayUtc).inDays;
   }
 
   static String relativeLabel(DateTime d) {

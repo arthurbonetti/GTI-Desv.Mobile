@@ -27,3 +27,8 @@ migrate_working_dir/
 .pub/
 /build/
 
+# Documentos locais / Materiais de estudo
+*.docx
+*.pdf
+
+

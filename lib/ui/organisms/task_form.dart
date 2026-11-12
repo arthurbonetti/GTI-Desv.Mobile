@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../data/models/task.dart';
+import '../../domain/task_suggestion.dart';
 import '../atoms/atoms.dart';
 import '../molecules/molecules.dart';
 
@@ -53,32 +54,22 @@ class _TaskFormState extends State<TaskForm> {
   /// aplicada apenas na criação de novas tarefas.
   void _onTitleChanged(String value) {
     if (_isEditing) return;
-    final text = value.toLowerCase();
-    TaskCategory? suggestedCategory;
-    const keywords = <TaskCategory, List<String>>{
-      TaskCategory.trabalho: ['reunião', 'reuniao', 'cliente', 'relatório', 'relatorio', 'projeto', 'email', 'e-mail', 'trabalho'],
-      TaskCategory.estudo: ['estudar', 'prova', 'aula', 'livro', 'curso', 'exercício', 'exercicio', 'faculdade', 'tcc'],
-      TaskCategory.saude: ['médico', 'medico', 'academia', 'treino', 'remédio', 'remedio', 'consulta', 'dentista', 'correr'],
-      TaskCategory.financas: ['pagar', 'conta', 'boleto', 'fatura', 'banco', 'investir', 'imposto'],
-      TaskCategory.pessoal: ['comprar', 'mercado', 'aniversário', 'aniversario', 'casa', 'limpar', 'ligar'],
-    };
-    for (final entry in keywords.entries) {
-      if (entry.value.any(text.contains)) {
-        suggestedCategory = entry.key;
-        break;
-      }
-    }
-    final urgent = ['urgente', 'hoje', 'importante', 'agora', 'asap']
-        .any(text.contains);
+    final suggestion = TaskSuggestion.fromTitle(value);
+    final nextCategory =
+        (!_categoryTouched && suggestion.category != null)
+            ? suggestion.category!
+            : _category;
+    final nextPriority =
+        (!_priorityTouched && suggestion.priority != null)
+            ? suggestion.priority!
+            : _priority;
 
-    final suggested = suggestedCategory;
-    setState(() {
-      // Só sugere se o usuário ainda não escolheu manualmente.
-      if (!_categoryTouched && suggested != null) {
-        _category = suggested;
-      }
-      if (!_priorityTouched && urgent) _priority = TaskPriority.alta;
-    });
+    if (nextCategory != _category || nextPriority != _priority) {
+      setState(() {
+        _category = nextCategory;
+        _priority = nextPriority;
+      });
+    }
   }
 
   void _submit() {

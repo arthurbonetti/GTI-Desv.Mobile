@@ -17,11 +17,17 @@ class DatePickerField extends StatelessWidget {
 
   Future<void> _pick(BuildContext context) async {
     final now = DateTime.now();
+    final minDate = DateTime(now.year - 5);
+    final maxDate = DateTime(now.year + 10);
+    final initial = date ?? now;
+    final firstDate = initial.isBefore(minDate) ? initial : minDate;
+    final lastDate = initial.isAfter(maxDate) ? initial : maxDate;
+
     final picked = await showDatePicker(
       context: context,
-      initialDate: date ?? now,
-      firstDate: DateTime(now.year - 1),
-      lastDate: DateTime(now.year + 5),
+      initialDate: initial,
+      firstDate: firstDate,
+      lastDate: lastDate,
       helpText: 'Data de vencimento',
       cancelText: 'Cancelar',
       confirmText: 'OK',
