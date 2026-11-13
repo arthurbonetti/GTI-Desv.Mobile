@@ -32,9 +32,10 @@ class _SearchFieldState extends State<SearchField> {
   @override
   void didUpdateWidget(covariant SearchField oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // Sincroniza quando os filtros são limpos externamente.
-    if (widget.initialValue != _controller.text &&
-        widget.initialValue.isEmpty) {
+    // Sincroniza apenas quando os filtros são limpos externamente.
+    if (oldWidget.initialValue != widget.initialValue &&
+        widget.initialValue.isEmpty &&
+        _controller.text.isNotEmpty) {
       _debounce?.cancel();
       _controller.clear();
     }

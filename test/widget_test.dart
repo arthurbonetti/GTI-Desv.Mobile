@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gerenciador_tarefas_inteligente/controllers/task_controller.dart';
 import 'package:gerenciador_tarefas_inteligente/core/utils/date_utils.dart';
@@ -7,6 +8,8 @@ import 'package:gerenciador_tarefas_inteligente/data/models/task.dart';
 import 'package:gerenciador_tarefas_inteligente/data/repositories/task_repository.dart';
 import 'package:gerenciador_tarefas_inteligente/domain/task_suggestion.dart';
 import 'package:gerenciador_tarefas_inteligente/main.dart';
+import 'package:gerenciador_tarefas_inteligente/ui/atoms/app_text_field.dart';
+import 'package:gerenciador_tarefas_inteligente/ui/core/app_feedback.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 Task _task(
@@ -135,5 +138,64 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Minhas Tarefas'), findsOneWidget);
     expect(find.text('Nenhuma tarefa ainda'), findsOneWidget);
+  });
+
+  testWidgets('SnackBar de exclusão desaparece automaticamente após 5 segundos',
+      (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: Builder(
+            builder: (context) => ElevatedButton(
+              onPressed: () => showUndoDeleteSnackBar(
+                ScaffoldMessenger.of(context),
+                message: '"Teste" excluída',
+                onUndo: () {},
+              ),
+              child: const Text('Excluir'),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    await tester.tap(find.text('Excluir'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(find.text('"Teste" excluída'), findsOneWidget);
+
+    await tester.pump(const Duration(seconds: 5));
+    await tester.pumpAndSettle();
+    expect(find.text('"Teste" excluída'), findsNothing);
+  });
+
+  test('DeadKeyInputFormatter compõe acentos em teclas mortas', () {
+    final formatter = DeadKeyInputFormatter();
+
+    final withAcute = formatter.formatEditUpdate(
+      const TextEditingValue(
+        text: '´',
+        selection: TextSelection.collapsed(offset: 1),
+      ),
+      const TextEditingValue(
+        text: '´a',
+        selection: TextSelection.collapsed(offset: 2),
+      ),
+    );
+    expect(withAcute.text, 'á');
+    expect(withAcute.selection.baseOffset, 1);
+
+    final withTilde = formatter.formatEditUpdate(
+      const TextEditingValue(
+        text: 'computaç~',
+        selection: TextSelection.collapsed(offset: 9),
+      ),
+      const TextEditingValue(
+        text: 'computaç~a',
+        selection: TextSelection.collapsed(offset: 10),
+      ),
+    );
+    expect(withTilde.text, 'computação'.substring(0, 9));
+    expect(withTilde.selection.baseOffset, 9);
   });
 }

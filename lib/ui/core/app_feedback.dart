@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../../core/theme/app_colors.dart';
@@ -29,23 +31,33 @@ Future<bool> showConfirmDeleteDialog(
   return confirmed ?? false;
 }
 
-/// Exibe uma SnackBar de exclusão com ação "Desfazer" padronizada.
+/// Exibe uma SnackBar de exclusão com ação "Desfazer" padronizada e fechamento
+/// automático após 5 segundos (mesmo com `SnackBarAction` presente).
 void showUndoDeleteSnackBar(
   ScaffoldMessengerState messenger, {
   required String message,
   required VoidCallback onUndo,
 }) {
-  messenger
-    ..hideCurrentSnackBar()
-    ..showSnackBar(
-      SnackBar(
-        content: Text(message),
-        duration: const Duration(seconds: 5),
-        action: SnackBarAction(
-          label: 'Desfazer',
-          textColor: AppColors.snackBarAction,
-          onPressed: onUndo,
-        ),
+  messenger.hideCurrentSnackBar();
+  Timer? autoCloseTimer;
+  late final ScaffoldFeatureController<SnackBar, SnackBarClosedReason>
+      controller;
+
+  controller = messenger.showSnackBar(
+    SnackBar(
+      content: Text(message),
+      duration: const Duration(seconds: 5),
+      action: SnackBarAction(
+        label: 'Desfazer',
+        textColor: AppColors.snackBarAction,
+        onPressed: onUndo,
       ),
-    );
+      onVisible: () {
+        autoCloseTimer?.cancel();
+        autoCloseTimer = Timer(const Duration(seconds: 5), controller.close);
+      },
+    ),
+  );
+
+  controller.closed.whenComplete(() => autoCloseTimer?.cancel());
 }
