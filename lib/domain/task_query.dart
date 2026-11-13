@@ -172,11 +172,14 @@ class TaskQuery {
 /// Remove espaços extras, converte para minúsculas e normaliza acentos comuns
 /// do português para buscas e ordenação alfabética consistentes.
 String normalizeSearchText(String input) {
-  const accents = 'áàâãäéèêëíìîïóòôõöúùûüçñ';
-  const plain = 'aaaaaeeeeiiiiooooouuuucn';
+  const accents = 'áàâãäéèêëíìîïóòôõöúùûüýÿçñ';
+  const plain = 'aaaaaeeeeiiiiooooouuuuyycn';
   final lower = input.trim().toLowerCase();
   final buffer = StringBuffer();
   for (var i = 0; i < lower.length; i++) {
+    final code = lower.codeUnitAt(i);
+    // Ignora marcas combinantes Unicode (NFD).
+    if (code >= 0x0300 && code <= 0x036F) continue;
     final ch = lower[i];
     final idx = accents.indexOf(ch);
     buffer.write(idx >= 0 ? plain[idx] : ch);

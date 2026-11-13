@@ -169,33 +169,34 @@ void main() {
     expect(find.text('"Teste" excluída'), findsNothing);
   });
 
-  test('DeadKeyInputFormatter compõe acentos em teclas mortas', () {
+  test('DeadKeyInputFormatter compõe todas as acentuações em teclas mortas', () {
     final formatter = DeadKeyInputFormatter();
 
-    final withAcute = formatter.formatEditUpdate(
-      const TextEditingValue(
-        text: '´',
-        selection: TextSelection.collapsed(offset: 1),
-      ),
-      const TextEditingValue(
-        text: '´a',
-        selection: TextSelection.collapsed(offset: 2),
-      ),
-    );
-    expect(withAcute.text, 'á');
-    expect(withAcute.selection.baseOffset, 1);
+    String apply(String before, String nextChar) {
+      final result = formatter.formatEditUpdate(
+        TextEditingValue(
+          text: before,
+          selection: TextSelection.collapsed(offset: before.length),
+        ),
+        TextEditingValue(
+          text: '$before$nextChar',
+          selection: TextSelection.collapsed(offset: before.length + 1),
+          composing: TextRange(start: 0, end: before.length + 1),
+        ),
+      );
+      return result.text;
+    }
 
-    final withTilde = formatter.formatEditUpdate(
-      const TextEditingValue(
-        text: 'computaç~',
-        selection: TextSelection.collapsed(offset: 9),
-      ),
-      const TextEditingValue(
-        text: 'computaç~a',
-        selection: TextSelection.collapsed(offset: 10),
-      ),
-    );
-    expect(withTilde.text, 'computação'.substring(0, 9));
-    expect(withTilde.selection.baseOffset, 9);
+    expect(apply('´', 'a'), 'á');
+    expect(apply('´', 'c'), 'ç');
+    expect(apply('`', 'a'), 'à');
+    expect(apply('ˋ', 'E'), 'È');
+    expect(apply('~', 'a'), 'ã');
+    expect(apply('˜', 'o'), 'õ');
+    expect(apply('^', 'e'), 'ê');
+    expect(apply('ˆ', 'O'), 'Ô');
+    expect(apply('¨', 'u'), 'ü');
+    expect(apply('¸', 'c'), 'ç');
+    expect(apply('a', '\u0301'), 'á');
   });
 }
